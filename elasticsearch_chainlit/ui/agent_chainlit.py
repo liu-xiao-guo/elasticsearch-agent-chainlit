@@ -25,7 +25,7 @@ async def main(question):
     user_questions: List = cl.user_session.get(KEY_USER_QUESTIONS)
     user_questions = user_questions[-cfg.questions_to_keep:] # Just keep the latet questions
     joined_questions = '\n'.join(user_questions)
-
+    
     memory_questions = f"""
 Here are some previous questions that you do not need to answer but consider in relationship to the actual question:
 ```
@@ -40,11 +40,11 @@ Make sure that after querying the indices you query the field names.
 {memory_questions}
 
 Then answer this question:
-{question}
+{question.content}
 """
     logger.info(message)
     logger.info(f"Memory size: {len(joined_questions)}")
     response = await cl.make_async(agent.run)(message, callbacks=[cb])
     await cl.Message(content=response).send()
-    user_questions.append(question)
+    user_questions.append(question.content)
     cl.user_session.set(KEY_USER_QUESTIONS, user_questions)
